@@ -1,20 +1,4 @@
 [English](../../contributing.md)
-| [Українська](./contributing_ua.md)
-| [Русский](./contributing_ru.md)
-| [Türkçe](./contributing_tr.md)
-| [Deutsch](./contributing_de.md)
-| [Français](./contributing_fr.md)
-| [Português (BR)](./contributing_pt_br.md)
-| [한국어](./contributing_kr.md)
-| [বাংলা](./contributing_bn.md)
-| [Español](./contributing_es.md)
-| [Italiano](./contributing_it.md)
-| [Română](./contributing_ro.md)
-| [Polski](./contributing_pl.md)
-| [简体中文](./contributing_cn.md)
-| [正體中文](./contributing_zhtw.md)
-| **日本語**
-| [हिंदी](./contributing_hi.md)
 
 ## 一緒に Bruno をよりよいものにしていきましょう！！
 
@@ -37,7 +21,7 @@ Bruno は Next.js と React で作られています。デスクトップアプ�
 
 ### 依存関係
 
-[Node v18.x もしくは最新の LTS バージョン](https://nodejs.org/en/)と npm 8.x が必要です。プロジェクトに npm ワークスペースを使用しています。
+[Node v20.x もしくは最新の LTS バージョン](https://nodejs.org/en/)と npm 8.x が必要です。プロジェクトに npm ワークスペースを使用しています。
 
 ## 開発
 
@@ -56,6 +40,8 @@ npm i --legacy-peer-deps
 npm run build:graphql-docs
 npm run build:bruno-query
 npm run build:bruno-common
+npm run build:bruno-converters
+npm run build:bruno-requests
 
 # run next app (terminal 1)
 npm run dev:web
@@ -81,11 +67,11 @@ find . -type f -name "package-lock.json" -delete
 ### テストを動かすには
 
 ```bash
-# bruno-schema
+# ブルーノスキーマのテストを実行します
 npm test --workspace=packages/bruno-schema
 
-# bruno-lang
-npm test --workspace=packages/bruno-lang
+# すべてのワークスペースでテストを実行します
+npm test --workspaces --if-present
 ```
 
 ### プルリクエストの手順

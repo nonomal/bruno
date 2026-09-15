@@ -1,9 +1,5 @@
 const inputsConfig = [
   {
-    key: 'callbackUrl',
-    label: 'Callback URL'
-  },
-  {
     key: 'authorizationUrl',
     label: 'Authorization URL'
   },
@@ -17,7 +13,8 @@ const inputsConfig = [
   },
   {
     key: 'clientSecret',
-    label: 'Client Secret'
+    label: 'Client Secret',
+    isSecret: true
   },
   {
     key: 'scope',
@@ -25,7 +22,8 @@ const inputsConfig = [
   },
   {
     key: 'state',
-    label: 'State'
+    label: 'State',
+    tooltip: 'If left empty, Bruno automatically generates a secure random value to help protect against CSRF attacks.'
   }
 ];
 

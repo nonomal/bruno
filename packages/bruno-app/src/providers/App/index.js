@@ -1,21 +1,52 @@
 import React, { useEffect } from 'react';
+import { get } from 'lodash';
 import { useDispatch } from 'react-redux';
-import { refreshScreenWidth } from 'providers/ReduxStore/slices/app';
+import { refreshScreenWidth, hydrateSidebarState } from 'providers/ReduxStore/slices/app';
 import ConfirmAppClose from './ConfirmAppClose';
+import MigrateCollectionToYmlModal from 'components/MigrateCollectionToYmlModal';
 import useIpcEvents from './useIpcEvents';
 import useTelemetry from './useTelemetry';
 import StyledWrapper from './StyledWrapper';
+import useOpenAPISyncPolling from './useOpenAPISyncPolling';
+import useChangelogOnUpdate from './useChangelogOnUpdate';
+import { version } from '../../../package.json';
 
 export const AppContext = React.createContext();
 
 export const AppProvider = (props) => {
-  useTelemetry();
+  useTelemetry({ version });
   useIpcEvents();
-
+  useOpenAPISyncPolling();
+  useChangelogOnUpdate();
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(refreshScreenWidth());
+    dispatch(hydrateSidebarState());
+    // v3.5.0 v4 migration tab state; feature was removed from main.
+    localStorage.removeItem('v4-migration');
+  }, []);
+
+  useEffect(() => {
+    const platform = get(navigator, 'platform', '').toLowerCase();
+
+    if (!platform) {
+      return;
+    }
+
+    if (platform.includes('mac')) {
+      document.body.classList.add('os-mac');
+      return;
+    }
+
+    if (platform.includes('win')) {
+      document.body.classList.add('os-windows');
+      return;
+    }
+
+    if (platform.includes('linux')) {
+      document.body.classList.add('os-linux');
+    }
   }, []);
 
   useEffect(() => {
@@ -29,13 +60,22 @@ export const AppProvider = (props) => {
   }, []);
 
   return (
-    <AppContext.Provider {...props} value="appProvider">
+    <AppContext.Provider {...props} value={{ version }}>
       <StyledWrapper>
         <ConfirmAppClose />
+        <MigrateCollectionToYmlModal />
         {props.children}
       </StyledWrapper>
     </AppContext.Provider>
   );
+};
+
+export const useApp = () => {
+  const context = React.useContext(AppContext);
+  if (!context) {
+    throw new Error('useApp must be used within an AppProvider');
+  }
+  return context;
 };
 
 export default AppProvider;

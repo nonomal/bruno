@@ -1,20 +1,4 @@
 [English](../../contributing.md)
-| [Українська](./contributing_ua.md)
-| [Русский](./contributing_ru.md)
-| [Türkçe](./contributing_tr.md)
-| [Deutsch](./contributing_de.md)
-| [Français](./contributing_fr.md)
-| [Português (BR)](./contributing_pt_br.md)
-| [한국어](./contributing_kr.md)
-| [বাংলা](./contributing_bn.md)
-| [Español](./contributing_es.md)
-| [Italiano](./contributing_it.md)
-| [Română](./contributing_ro.md)
-| [Polski](./contributing_pl.md)
-| **简体中文**
-| [正體中文](./contributing_zhtw.md)
-| [日本語](./contributing_ja.md)
-| [हिंदी](./contributing_hi.md)
 
 ## 让我们一起改进 Bruno！
 
@@ -37,7 +21,7 @@ Bruno 基于 NextJs 和 React 构建。我们使用 Electron 来封装桌面版�
 
 ### 依赖项
 
-您需要 [Node v18.x 或最新的 LTS 版本](https://nodejs.org/en/) 和 npm 8.x。我们在这个项目中也使用 npm 工作区（_npm workspaces_）。
+您需要 [Node v20.x 或最新的 LTS 版本](https://nodejs.org/en/) 和 npm 8.x。我们在这个项目中也使用 npm 工作区（_npm workspaces_）。
 
 ## 开发
 
@@ -86,11 +70,11 @@ find . -type f -name "package-lock.json" -delete
 ### 测试
 
 ```bash
-# bruno-schema
+# 运行 bruno-schema 测试
 npm test --workspace=packages/bruno-schema
 
-# bruno-lang
-npm test --workspace=packages/bruno-lang
+# 在所有工作区上运行测试
+npm test --workspaces --if-present
 ```
 
 ### 提交 Pull Request

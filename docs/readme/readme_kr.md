@@ -3,7 +3,7 @@
 
 ### Bruno - API 탐색 및 테스트를 위한 오픈소스 IDE.
 
-[![GitHub version](https://badge.fury.io/gh/usebruno%2Fbruno.svg)](https://badge.fury.io/gh/usebruno%bruno)
+[![GitHub version](https://badge.fury.io/gh/usebruno%2Fbruno.svg)](https://badge.fury.io/gh/usebruno%2Fbruno)
 [![CI](https://github.com/usebruno/bruno/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/usebruno/bruno/actions/workflows/tests.yml)
 [![Commit Activity](https://img.shields.io/github/commit-activity/m/usebruno/bruno)](https://github.com/usebruno/bruno/pulse)
 [![X](https://img.shields.io/twitter/follow/use_bruno?style=social&logo=x)](https://twitter.com/use_bruno)
@@ -27,6 +27,7 @@
 | [正體中文](./readme_zhtw.md)
 | [العربية](./readme_ar.md)
 | [日本語](./readme_ja.md)
+| [ქართული](./readme_ka.md)
 
 Bruno는 새롭고 혁신적인 API 클라이언트로, Postman과 유사한 툴들을 혁신하는 것을 목표로 합니다.
 
@@ -58,12 +59,14 @@ snap install bruno
 
 # On Linux via Apt
 sudo mkdir -p /etc/apt/keyrings
-sudo gpg --no-default-keyring --keyring /etc/apt/keyrings/bruno.gpg --keyserver keyserver.ubuntu.com --recv-keys 9FA6017ECABE0266
-
-echo "deb [signed-by=/etc/apt/keyrings/bruno.gpg] http://debian.usebruno.com/ bruno stable" | sudo tee /etc/apt/sources.list.d/bruno.list
-
-sudo apt update
-sudo apt install bruno
+sudo apt update && sudo apt install gpg curl
+curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x9FA6017ECABE0266" \
+  | gpg --dearmor \
+  | sudo tee /etc/apt/keyrings/bruno.gpg > /dev/null
+sudo chmod 644 /etc/apt/keyrings/bruno.gpg
+echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/bruno.gpg] http://debian.usebruno.com/ bruno stable" \
+  | sudo tee /etc/apt/sources.list.d/bruno.list
+sudo apt update && sudo apt install bruno
 ```
 
 ### 여러 플랫폼에서 실행하세요. 🖥️

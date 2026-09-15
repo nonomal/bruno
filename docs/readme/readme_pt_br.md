@@ -3,7 +3,7 @@
 
 ### Bruno - IDE de código aberto para explorar e testar APIs.
 
-[![GitHub version](https://badge.fury.io/gh/usebruno%2Fbruno.svg)](https://badge.fury.io/gh/usebruno%bruno)
+[![GitHub version](https://badge.fury.io/gh/usebruno%2Fbruno.svg)](https://badge.fury.io/gh/usebruno%2Fbruno)
 [![CI](https://github.com/usebruno/bruno/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/usebruno/bruno/actions/workflows/tests.yml)
 [![Commit Activity](https://img.shields.io/github/commit-activity/m/usebruno/bruno)](https://github.com/usebruno/bruno/pulse)
 [![X](https://img.shields.io/twitter/follow/use_bruno?style=social&logo=x)](https://twitter.com/use_bruno)
@@ -27,6 +27,7 @@
 | [正體中文](./readme_zhtw.md)
 | [العربية](./readme_ar.md)
 | [日本語](./readme_ja.md)
+| [ქართული](./readme_ka.md)
 
 Bruno é um novo e inovador cliente de API, com o objetivo de revolucionar o status quo representado por ferramentas como o Postman e outras semelhantes.
 
@@ -39,13 +40,6 @@ Bruno é totalmente offline. Não há planos de adicionar sincronização em nuv
 📢 Assista à nossa palestra recente na India FOSS 3.0 Conference [aqui](https://www.youtube.com/watch?v=7bSMFpbcPiY).
 
 ![bruno](../../assets/images/landing-2.png) <br /><br />
-
-### Golden Edition ✨
-
-A grande maioria dos nossos recursos são gratuitos e de código aberto.
-Nós nos esforçamos para encontrar um equilíbrio harmônico entre [princípios de código aberto e sustentabilidade](https://github.com/usebruno/bruno/discussions/269)
-
-Você pode pré encomendar o plano [Golden Edition](https://www.usebruno.com/pricing) por ~~USD $19~~ **USD $9**! <br/>
 
 ### Instalação
 
@@ -75,12 +69,14 @@ flatpak install com.usebruno.Bruno
 
 # No Linux via Apt
 sudo mkdir -p /etc/apt/keyrings
-sudo gpg --no-default-keyring --keyring /etc/apt/keyrings/bruno.gpg --keyserver keyserver.ubuntu.com --recv-keys 9FA6017ECABE0266
-
-echo "deb [signed-by=/etc/apt/keyrings/bruno.gpg] http://debian.usebruno.com/ bruno stable" | sudo tee /etc/apt/sources.list.d/bruno.list
-
-sudo apt update
-sudo apt install bruno
+sudo apt update && sudo apt install gpg curl
+curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x9FA6017ECABE0266" \
+  | gpg --dearmor \
+  | sudo tee /etc/apt/keyrings/bruno.gpg > /dev/null
+sudo chmod 644 /etc/apt/keyrings/bruno.gpg
+echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/bruno.gpg] http://debian.usebruno.com/ bruno stable" \
+  | sudo tee /etc/apt/sources.list.d/bruno.list
+sudo apt update && sudo apt install bruno
 ```
 
 ### Execute em várias plataformas 🖥️
@@ -92,16 +88,6 @@ sudo apt install bruno
 Ou qualquer sistema de controle de versão de sua escolha.
 
 ![bruno](../../assets/images/version-control.png) <br /><br />
-
-### Apoiadores
-
-#### Apoiadores Gold
-
-<img src="../../assets/images/sponsors/samagata.png" width="150"/>
-
-#### Apoiadores Silver
-
-<img src="../../assets/images/sponsors/commit-company.png" width="70"/>
 
 ### Links Importantes 📌
 

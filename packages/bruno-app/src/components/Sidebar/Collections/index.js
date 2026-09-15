@@ -1,131 +1,121 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  IconSearch,
-  IconFolders,
-  IconArrowsSort,
-  IconSortAscendingLetters,
-  IconSortDescendingLetters,
-  IconX
-} from '@tabler/icons';
-import Collection from '../Collections/Collection';
-import CreateCollection from '../CreateCollection';
+import React, { useState, useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import Collection from './Collection';
+import GitRemoteCollectionRow from './GitRemoteCollectionRow';
 import StyledWrapper from './StyledWrapper';
 import CreateOrOpenCollection from './CreateOrOpenCollection';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import { sortCollections } from 'providers/ReduxStore/slices/collections/actions';
+import CollectionSearch from './CollectionSearch/index';
+import InlineCollectionCreator from './InlineCollectionCreator';
+import { clearSidebarSelection } from 'providers/ReduxStore/slices/collections';
+import { buildSidebarEntries, getSelectionInfo } from 'utils/collections/index';
+import { CollectionItemDragPreview } from './Collection/CollectionItem/CollectionItemDragPreview';
+import useBulkActionsMenu from 'hooks/useBulkActionsMenu';
+import BulkActionsMenu from 'components/Sidebar/Collections/BulkActionsMenu';
 
-// todo: move this to a separate folder
-// the coding convention is to keep all the components in a folder named after the component
-const CollectionsBadge = () => {
-  const dispatch = useDispatch();
-  const { collections } = useSelector((state) => state.collections);
-  const { collectionSortOrder } = useSelector((state) => state.collections);
-  const sortCollectionOrder = () => {
-    let order;
-    switch (collectionSortOrder) {
-      case 'default':
-        order = 'alphabetical';
-        break;
-      case 'alphabetical':
-        order = 'reverseAlphabetical';
-        break;
-      case 'reverseAlphabetical':
-        order = 'default';
-        break;
-    }
-    dispatch(sortCollections({ order }));
-  };
-  return (
-    <div className="items-center mt-2 relative">
-      <div className="collections-badge flex items-center justify-between px-2">
-        <div className="flex items-center  py-1 select-none">
-          <span className="mr-2">
-            <IconFolders size={18} strokeWidth={1.5} />
-          </span>
-          <span>Collections</span>
-        </div>
-        {collections.length >= 1 && (
-          <button onClick={() => sortCollectionOrder()}>
-            {collectionSortOrder == 'default' ? (
-              <IconArrowsSort size={18} strokeWidth={1.5} />
-            ) : collectionSortOrder == 'alphabetical' ? (
-              <IconSortAscendingLetters size={18} strokeWidth={1.5} />
-            ) : (
-              <IconSortDescendingLetters size={18} strokeWidth={1.5} />
-            )}
-          </button>
-        )}
-      </div>
-    </div>
-  );
-};
-
-const Collections = () => {
+const Collections = ({ showSearch, isCreatingCollection, onCreateClick, onDismissCreate, onOpenAdvancedCreate }) => {
   const [searchText, setSearchText] = useState('');
-  const { collections } = useSelector((state) => state.collections);
-  const [createCollectionModalOpen, setCreateCollectionModalOpen] = useState(false);
+  const { collections, collectionSortOrder, selectedSidebarUids } = useSelector((state) => state.collections);
+  const { workspaces, activeWorkspaceUid } = useSelector((state) => state.workspaces);
+  const dispatch = useDispatch();
 
-  if (!collections || !collections.length) {
+  const { openBulkMenu, menuProps } = useBulkActionsMenu();
+
+  const activeWorkspace = workspaces.find((w) => w.uid === activeWorkspaceUid) || workspaces.find((w) => w.type === 'default');
+
+  // Build the sidebar list in workspace.yml order. Each entry is either a fully
+  // loaded collection (rendered via <Collection />) or, for non-default workspaces,
+  // a "ghost" git-backed entry whose local folder is missing (rendered via
+  // <GitRemoteCollectionRow /> so the user can click to clone it).
+  const sidebarEntries = useMemo(
+    () => buildSidebarEntries({ collections, workspaces, activeWorkspace, collectionSortOrder }),
+    [activeWorkspace, collections, workspaces, collectionSortOrder]
+  );
+
+  const selectionInfo = useMemo(
+    () => (selectedSidebarUids.length > 1 ? getSelectionInfo({ collections, selectedUids: selectedSidebarUids }) : null),
+    [collections, selectedSidebarUids]
+  );
+
+  // A collection can't be dragged together with folders/requests/apps from inside it.
+  const hasMixedCollectionSelection = Boolean(
+    selectionInfo?.hasCollection
+    && (selectionInfo.hasFolder || selectionInfo.hasRequest || selectionInfo.hasApp)
+  );
+
+  // Whether a selected collection row can be dragged as part of the multi-selection.
+  const isCollectionMultiDragDisabled = !!selectionInfo && (selectionInfo.hasExample || hasMixedCollectionSelection);
+
+  // Whether a selected folder/request/app row can be dragged as part of the multi-selection.
+  const isItemMultiDragDisabled = !!selectionInfo && (selectionInfo.hasExample || selectionInfo.hasCollection);
+
+  const multiDragCollections = useMemo(() => {
+    if (!selectionInfo || selectionInfo.hasFolder || selectionInfo.hasRequest || selectionInfo.hasApp || selectionInfo.hasExample) return null;
+    return selectionInfo.effectiveSelection.filter((entry) => entry.type === 'collection').map((entry) => entry.collection);
+  }, [selectionInfo]);
+
+  const multiDragItems = useMemo(() => {
+    if (!selectionInfo || selectionInfo.hasCollection || selectionInfo.hasExample) return null;
+    return selectionInfo.effectiveSelection.map((entry) => ({ ...entry.item, sourceCollectionUid: entry.collectionUid }));
+  }, [selectionInfo]);
+
+  const handleContainerClick = (e) => {
+    if (e.currentTarget === e.target) {
+      dispatch(clearSidebarSelection());
+    }
+  };
+
+  if (!sidebarEntries.length) {
     return (
       <StyledWrapper>
-        <CollectionsBadge />
-        <CreateOrOpenCollection />
+        {isCreatingCollection && (
+          <InlineCollectionCreator
+            onComplete={onDismissCreate}
+            onCancel={onDismissCreate}
+            onOpenAdvanced={onOpenAdvancedCreate}
+          />
+        )}
+        {!isCreatingCollection && <CreateOrOpenCollection onCreateClick={onCreateClick} />}
       </StyledWrapper>
     );
   }
 
   return (
-    <StyledWrapper>
-      {createCollectionModalOpen ? <CreateCollection onClose={() => setCreateCollectionModalOpen(false)} /> : null}
+    <StyledWrapper data-testid="collections">
+      {showSearch && (
+        <CollectionSearch searchText={searchText} setSearchText={setSearchText} />
+      )}
 
-      <CollectionsBadge />
-
-      <div className="mt-4 relative collection-filter px-2">
-        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <span className="text-gray-500 sm:text-sm">
-            <IconSearch size={16} strokeWidth={1.5} />
-          </span>
-        </div>
-        <input
-          type="text"
-          name="search"
-          id="search"
-          autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="off"
-          spellCheck="false"
-          className="block w-full pl-7 py-1 sm:text-sm"
-          placeholder="search"
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value.toLowerCase())}
-        />
-        {searchText !== '' && (
-          <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
-            <span
-              className="close-icon"
-              onClick={() => {
-                setSearchText('');
-              }}
-            >
-              <IconX size={16} strokeWidth={1.5} className="cursor-pointer" />
-            </span>
-          </div>
+      <div
+        className="collections-list flex flex-col flex-1 overflow-hidden hover:overflow-y-auto"
+        onClick={handleContainerClick}
+      >
+        {isCreatingCollection && (
+          <InlineCollectionCreator
+            onComplete={onDismissCreate}
+            onCancel={onDismissCreate}
+            onOpenAdvanced={onOpenAdvancedCreate}
+          />
         )}
+        {sidebarEntries.map((entry) => {
+          if (entry.kind === 'loaded') {
+            return (
+              <Collection
+                searchText={searchText}
+                collection={entry.collection}
+                key={entry.key}
+                openBulkMenu={openBulkMenu}
+                isCollectionMultiDragDisabled={isCollectionMultiDragDisabled}
+                isItemMultiDragDisabled={isItemMultiDragDisabled}
+                multiDragCollections={multiDragCollections}
+                multiDragItems={multiDragItems}
+              />
+            );
+          }
+          return <GitRemoteCollectionRow entry={entry.entry} key={entry.key} />;
+        })}
       </div>
-
-      <div className="mt-4 flex flex-col overflow-y-auto absolute top-32 bottom-10 left-0 right-0">
-        {collections && collections.length
-          ? collections.map((c) => {
-              return (
-                <DndProvider backend={HTML5Backend} key={c.uid}>
-                  <Collection searchText={searchText} collection={c} key={c.uid} />
-                </DndProvider>
-              );
-            })
-          : null}
-      </div>
+      <CollectionItemDragPreview />
+      <BulkActionsMenu menuProps={menuProps} />
     </StyledWrapper>
   );
 };

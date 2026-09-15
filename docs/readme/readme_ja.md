@@ -3,7 +3,7 @@
 
 ### Bruno - API の検証・動作テストのためのオープンソース IDE.
 
-[![GitHub version](https://badge.fury.io/gh/usebruno%2Fbruno.svg)](https://badge.fury.io/gh/usebruno%bruno)
+[![GitHub version](https://badge.fury.io/gh/usebruno%2Fbruno.svg)](https://badge.fury.io/gh/usebruno%2Fbruno)
 [![CI](https://github.com/usebruno/bruno/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/usebruno/bruno/actions/workflows/tests.yml)
 [![Commit Activity](https://img.shields.io/github/commit-activity/m/usebruno/bruno)](https://github.com/usebruno/bruno/pulse)
 [![X](https://img.shields.io/twitter/follow/use_bruno?style=social&logo=x)](https://twitter.com/use_bruno)
@@ -27,6 +27,7 @@
 | [正體中文](./readme_zhtw.md)
 | [العربية](./readme_ar.md)
 | **日本語**
+| [ქართული](./readme_ka.md)
 
 Bruno は革新的な API クライアントです。Postman を代表する API クライアントツールの現状に一石を投じることを目指しています。
 
@@ -41,13 +42,6 @@ Bruno はオフラインのみで利用できます。Bruno にクラウド同�
 📢 India FOSS 3.0 Conference での発表の様子は[こちら](https://www.youtube.com/watch?v=7bSMFpbcPiY)から
 
 ![bruno](/assets/images/landing-2.png) <br /><br />
-
-### ゴールデンエディション ✨
-
-機能のほとんどが無料で使用でき、オープンソースとなっています。
-私たちは[オープンソースの原則と長期的な維持](https://github.com/usebruno/bruno/discussions/269)の間でうまくバランスを取ろうと努力しています。
-
-[ゴールデンエディション](https://www.usebruno.com/pricing)を **19 ドル** (買い切り)で購入できます！
 
 ### インストール方法
 
@@ -77,12 +71,14 @@ flatpak install com.usebruno.Bruno
 
 # LinuxでAptを使ってインストール
 sudo mkdir -p /etc/apt/keyrings
-sudo gpg --no-default-keyring --keyring /etc/apt/keyrings/bruno.gpg --keyserver keyserver.ubuntu.com --recv-keys 9FA6017ECABE0266
-
-echo "deb [signed-by=/etc/apt/keyrings/bruno.gpg] http://debian.usebruno.com/ bruno stable" | sudo tee /etc/apt/sources.list.d/bruno.list
-
-sudo apt update
-sudo apt install bruno
+sudo apt update && sudo apt install gpg curl
+curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x9FA6017ECABE0266" \
+  | gpg --dearmor \
+  | sudo tee /etc/apt/keyrings/bruno.gpg > /dev/null
+sudo chmod 644 /etc/apt/keyrings/bruno.gpg
+echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/bruno.gpg] http://debian.usebruno.com/ bruno stable" \
+  | sudo tee /etc/apt/sources.list.d/bruno.list
+sudo apt update && sudo apt install bruno
 ```
 
 ### マルチプラットフォームでの実行に対応 🖥️

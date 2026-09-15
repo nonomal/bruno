@@ -9,10 +9,11 @@ async function resolveAwsV4Credentials(request) {
   const awsv4 = request.awsv4config;
   if (isStrPresent(awsv4.profileName)) {
     try {
-      credentialsProvider = fromIni({
-        profile: awsv4.profileName
+      const credentialsProvider = fromIni({
+        profile: awsv4.profileName,
+        ignoreCache: true
       });
-      credentials = await credentialsProvider();
+      const credentials = await credentialsProvider();
       awsv4.accessKeyId = credentials.accessKeyId;
       awsv4.secretAccessKey = credentials.secretAccessKey;
       awsv4.sessionToken = credentials.sessionToken;
@@ -47,7 +48,12 @@ function addAwsV4Interceptor(axiosInstance, request) {
     }
   });
 
-  axiosInstance.interceptors.request.use(interceptor);
+  axiosInstance.interceptors.request.use((config) => {
+    if (config.__skipAwsV4Sign) {
+      return config;
+    }
+    return interceptor(config);
+  });
 }
 
 module.exports = {

@@ -1,12 +1,11 @@
 {
   "version": "1",
-  "name": "collection_oauth2",
+  "name": "OAuth2 Demo",
   "type": "collection",
   "scripts": {
-    "moduleWhitelist": ["crypto"],
-    "filesystemAccess": {
-      "allow": true
-    }
+    "moduleWhitelist": [
+      "crypto"
+    ]
   },
   "clientCertificates": {
     "enabled": true,

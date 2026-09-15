@@ -1,6 +1,9 @@
 const _ = require('lodash');
 const Store = require('electron-store');
-const { encryptString } = require('../utils/encryption');
+const { valueToString } = require('@usebruno/common/utils');
+const { encryptStringSafe } = require('../utils/encryption');
+
+const posixifyPath = (p) => (p ? p.replace(/\\/g, '/') : p);
 
 /**
  * Sample secrets store file
@@ -27,28 +30,25 @@ class EnvironmentSecretsStore {
     });
   }
 
-  isValidValue(val) {
-    return typeof val === 'string' && val.length >= 0;
-  }
-
   storeEnvSecrets(collectionPathname, environment) {
+    const normalizedPathname = posixifyPath(collectionPathname);
     const envVars = [];
     _.each(environment.variables, (v) => {
       if (v.secret) {
         envVars.push({
           name: v.name,
-          value: this.isValidValue(v.value) ? encryptString(v.value) : ''
+          value: encryptStringSafe(valueToString(v.value)).value
         });
       }
     });
 
     const collections = this.store.get('collections') || [];
-    const collection = _.find(collections, (c) => c.path === collectionPathname);
+    const collection = _.find(collections, (c) => posixifyPath(c.path) === normalizedPathname);
 
     // if collection doesn't exist, create it, add the environment and save
     if (!collection) {
       collections.push({
-        path: collectionPathname,
+        path: normalizedPathname,
         environments: [
           {
             name: environment.name,
@@ -60,6 +60,8 @@ class EnvironmentSecretsStore {
       this.store.set('collections', collections);
       return;
     }
+
+    collection.path = normalizedPathname;
 
     // if collection exists, check if environment exists
     // if environment doesn't exist, add the environment and save
@@ -81,8 +83,9 @@ class EnvironmentSecretsStore {
   }
 
   getEnvSecrets(collectionPathname, environment) {
+    const normalizedPathname = posixifyPath(collectionPathname);
     const collections = this.store.get('collections') || [];
-    const collection = _.find(collections, (c) => c.path === collectionPathname);
+    const collection = _.find(collections, (c) => posixifyPath(c.path) === normalizedPathname);
     if (!collection) {
       return [];
     }
@@ -96,8 +99,9 @@ class EnvironmentSecretsStore {
   }
 
   renameEnvironment(collectionPathname, oldName, newName) {
+    const normalizedPathname = posixifyPath(collectionPathname);
     const collections = this.store.get('collections') || [];
-    const collection = _.find(collections, (c) => c.path === collectionPathname);
+    const collection = _.find(collections, (c) => posixifyPath(c.path) === normalizedPathname);
     if (!collection) {
       return;
     }
@@ -112,8 +116,9 @@ class EnvironmentSecretsStore {
   }
 
   deleteEnvironment(collectionPathname, environmentName) {
+    const normalizedPathname = posixifyPath(collectionPathname);
     const collections = this.store.get('collections') || [];
-    const collection = _.find(collections, (c) => c.path === collectionPathname);
+    const collection = _.find(collections, (c) => posixifyPath(c.path) === normalizedPathname);
     if (!collection) {
       return;
     }

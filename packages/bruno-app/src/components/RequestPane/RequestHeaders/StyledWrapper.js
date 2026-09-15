@@ -1,37 +1,113 @@
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
-  table {
+
+  .btn-action {
+    font-size: ${(props) => props.theme.font.size.base};
+    &:hover span {
+      text-decoration: underline;
+    }
+  }
+
+  .toggle-inherited-headers {
+    color: ${(props) => props.theme.text};
+
+    &:hover {
+      color: ${(props) => props.theme.text};
+    }
+  }
+
+  .bulk-edit-bar {
+    position: sticky;
+    bottom: 0;
+    background: ${(props) => props.theme.bg};
+    padding-top: 8px;
+    padding-bottom: 4px;
+  }
+
+  button.headers-section-toggle {
     width: 100%;
-    border-collapse: collapse;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 0 10px;
+    color: ${(props) => props.theme.text};
+    background: ${(props) => props.theme.sidebar.bg};
+    border: 0;
+    border-bottom: solid 1px ${(props) => props.theme.border.border0};
+    border-radius: 0;
+    box-sizing: border-box;
+    font-size: ${(props) => props.theme.font.size.base};
     font-weight: 600;
-    table-layout: fixed;
+    text-align: left;
+    cursor: pointer;
 
-    thead,
-    td {
-      border: 1px solid ${(props) => props.theme.table.border};
+    &:hover {
+      color: ${(props) => props.theme.text};
+      background: ${(props) => props.theme.sidebar.bg};
+    }
+  }
+
+  .default-header-row,
+  .inherited-header-row {
+    .default-header-value {
+      font-style: italic;
+      color: ${(props) => props.theme.colors.text.muted};
     }
 
-    thead {
-      color: ${(props) => props.theme.table.thead.color};
-      font-size: 0.8125rem;
-      user-select: none;
+    input[type='checkbox']:disabled {
+      opacity: 0.55;
     }
-    td {
-      padding: 6px 10px;
+  }
 
-      &:nth-child(1) {
-        width: 30%;
-      }
+  .inherited-header-row {
+    .CodeMirror-line {
+      font-style: italic;
+      color: ${(props) => props.theme.colors.text.muted};
+    }
+  }
 
-      &:nth-child(3) {
-        width: 70px;
+  .inherited-header-source {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: ${(props) => props.theme.colors.text.muted};
+
+      &:hover {
+        color: ${(props) => props.theme.text};
       }
     }
   }
 
-  .btn-add-header {
-    font-size: 0.8125rem;
+  .header-name-cell {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+
+    > :first-child {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+  }
+
+  .default-header-info {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: ${(props) => props.theme.colors.text.muted};
+    cursor: help;
+
+    &:hover {
+      color: ${(props) => props.theme.colors.text.muted};
+    }
   }
 
   input[type='text'] {
